@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KAZI — Emploi RDC</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="toast" id="toast"></div>
+
+  <div class="app">
+    <header class="topbar">
+      <a href="#home" class="brand" onclick="logoClick(event)">
+        <img src="kazi-logo.png" alt="KAZI Logo" class="site-logo" />
+      </a>
+
+      <button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+      <nav class="nav" id="navMenu">
+        <a href="#home">Accueil</a>
+        <a href="#jobsSection">Emplois</a>
+        <a href="#publicationsSection">Publications</a>
+        <button onclick="openMarketplace()">Marketplace</button>
+        <button onclick="openLogin()" id="loginNavBtn">Se connecter</button>
+        <button class="logout" onclick="logout()" id="logoutNavBtn">Déconnexion</button>
+      </nav>
+    </header>
+
+    <main class="layout" id="home">
+      <section class="phone-card reveal">
+        <div class="statusbar">
+          <span>9:41</span>
+          <span>●●● 🔋</span>
+        </div>
+
+        <div class="app-head">
+          <img src="kazi-logo.png" alt="KAZI Logo" class="app-logo-img" />
+          <button class="icon-btn notif-btn" onclick="openNotifications()">🔔<span id="notifBadge">0</span></button>
+        </div>
+
+        <div class="search-row">
+          <input id="searchInput" placeholder="🔍 Rechercher un emploi..." oninput="renderAll()" />
+          <button class="icon-btn" onclick="performSearch()">☷</button>
+        </div>
+
+        <div class="filters">
+          <select id="cityInput" onchange="renderAll()">
+<option value="">Toute la RDC</option>
+<option>Kinshasa</option>
+<option>Lubumbashi</option>
+<option>Mbuji-Mayi</option>
+<option>Kisangani</option>
+<option>Kananga</option>
+<option>Goma</option>
+<option>Bukavu</option>
+<option>Kolwezi</option>
+<option>Matadi</option>
+<option>Bunia</option>
+</select>
+
+          <select id="modeInput" onchange="renderAll()">
+            <option value="">Mode</option>
+            <option>Temps plein</option>
+            <option>Temps partiel</option>
+            <option>En ligne</option>
+          </select>
+        </div>
+
+        <div class="hero-banner">
+          <div>
+            <h1>Trouvez l’emploi qui vous correspond</h1>
+            <p>Des opportunités vérifiables, avec détails du poste et entreprise.</p>
+            <button onclick="performSearch()">Voir les offres</button>
+          </div>
+          <div class="people-art"></div>
+        </div>
+
+        <div class="categories">
+          <button class="cat active" onclick="setCategory('', this)">▦<small>Tout</small></button>
+          <button class="cat" onclick="setCategory('Diplômé', this)">🎓<small>Diplômé</small></button>
+          <button class="cat" onclick="setCategory('Petit boulot', this)">👤<small>Petit</small></button>
+          <button class="cat" onclick="setCategory('Stage', this)">💼<small>Stage</small></button>
+          <button class="cat" onclick="setCategory('Freelance', this)">💻<small>Freelance</small></button>
+        </div>
+
+        <div class="title-row">
+          <h2>Offres récentes</h2>
+          <a onclick="openAllJobs()">Voir tout</a>
+        </div>
+
+        <div class="job-list" id="homeJobs"></div>
+
+        <div class="bottom-nav">
+          <button class="active" onclick="goHome()">🏠<br>Accueil</button>
+          <button onclick="openAllJobs()">💼<br>Emplois</button>
+          <button onclick="openMarketplace()">🏪<br>Market</button>
+          <button onclick="openLogin()">👤<br>Profil</button>
+        </div>
+      </section>
+
+      <section class="detail-card reveal">
+        <div class="detail-top">
+          <button class="outline" onclick="previousJob()">←</button>
+          <h3>Détails de l’offre</h3>
+          <button class="outline" onclick="nextJob()">→</button>
+        </div>
+
+        <div id="jobDetailArea"></div>
+      </section>
+
+      <section class="side-panel reveal">
+        <div class="login-logo">
+          <img src="kazi-logo.png" alt="KAZI Logo" class="login-logo-img" />
+        </div>
+
+        <h2 id="welcomeTitle">Bienvenue sur KAZI</h2>
+        <p id="welcomeText">Connectez-vous pour publier, postuler et gérer vos offres.</p>
+
+        <form class="form" id="loginForm">
+          <select id="authMode"><option>Connexion</option><option>Créer compte</option></select>
+<input id="loginEmail" type="email" placeholder="✉ Email" />
+<input id="loginPhone" placeholder="📱 Numéro téléphone (optionnel)" />
+          <input id="loginName" placeholder="👤 Votre nom" required />
+          <button type="submit">SE CONNECTER</button>
+        </form>
+
+        <div class="social-login" id="socialLogin">
+          <button onclick="socialLogin('Google')">G Continuer avec Google</button>
+          <button onclick="socialLogin('iCloud')"> Continuer avec iCloud</button>
+        </div>
+
+        <div id="loggedPanel">
+          <div class="profile-menu">
+            <div class="profile-line"><span>👤 Utilisateur</span><strong id="profileName">-</strong></div>
+            <div class="profile-line"><span>📄 Candidatures envoyées</span><strong id="applicationCount">0</strong></div>
+            <div class="profile-line"><span>📥 Candidatures reçues</span><strong id="receivedCount">0</strong></div>
+            <div class="profile-line"><span>📝 Publications</span><strong id="publicationCount">0</strong></div>
+            <div class="profile-line"><span>🛡️ Admin</span><strong id="adminState">OFF</strong></div>
+          </div>
+
+          <button onclick="openNotifications()" class="wide">Notifications</button>
+          <button onclick="openMyContent()" class="wide outline">Mes publications</button>
+          <button onclick="openSettings()" class="wide outline">Paramètres</button>
+          <button onclick="openPostPublication()" class="wide">Poster une publication</button>
+          <button onclick="openPostJob()" class="wide outline">Publier une offre</button>
+          <button onclick="logout()" class="wide logout">Se déconnecter</button>
+        </div>
+      </section>
+
+      <section class="owner-box reveal">
+        <div class="title-row">
+          <div>
+            <h2>Mes publications</h2>
+            <p>Seul l’admin peut changer le statut Libre / Pris. L’auteur reçoit les candidatures.</p>
+          </div>
+          <div class="actions">
+            <button onclick="openPostJob()">Publier offre</button>
+            <button class="outline" onclick="openPostPublication()">Poster publication</button>
+          </div>
+        </div>
+
+        <div id="ownerJobs" class="owner-table"></div>
+      </section>
+    </main>
+
+    <section class="section" id="jobsSection">
+      <div class="title-row">
+        <h2>Résultats de recherche</h2>
+        <button onclick="openPostJob()">Publier emploi gratuit</button>
+      </div>
+      <div class="job-list" id="resultJobs"></div>
+    </section>
+
+    <section class="section" id="publicationsSection">
+      <div class="title-row">
+        <h2>Publications récentes</h2>
+        <button onclick="openPostPublication()">Poster une publication</button>
+      </div>
+      <div class="job-list" id="publicationsList"></div>
+    </section>
+  </div>
+
+  <div class="modal" id="allJobsModal">
+    <div class="modal-content xlarge">
+      <button class="close" onclick="closeModal('allJobsModal')">×</button>
+      <h2>Toutes les offres</h2>
+      <div class="job-list modal-list" id="allJobsList"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="marketModal">
+    <div class="modal-content xlarge">
+      <button class="close" onclick="closeModal('marketModal')">×</button>
+      <div class="title-row">
+        <div>
+          <h2>Marketplace</h2>
+          <p>Publier un service demande Premium 10$.</p>
+        </div>
+        <button onclick="openPremium()">Publier service premium</button>
+      </div>
+      <div class="job-list" id="servicesList"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="premiumModal">
+    <div class="modal-content small">
+      <button class="close" onclick="closeModal('premiumModal')">×</button>
+      <h2>Accès Premium</h2>
+      <p class="price">10$</p>
+      <p>Simulation de paiement pour publier un service.</p>
+      <div class="form"><select id="payMethod"><option>Carte bancaire</option><option>PayPal</option></select><input placeholder="Nom sur la carte"><input placeholder="Numéro carte"><div class="form-row"><input placeholder="Expiration"><input placeholder="CVV"></div><button onclick="confirmPremium()" type="button" class="wide">PAYER 10$</button></div>
+    </div>
+  </div>
+
+  <div class="modal" id="contactSellerModal">
+    <div class="modal-content small">
+      <button class="close" onclick="closeModal('contactSellerModal')">×</button>
+      <h2>Contacter le vendeur</h2>
+      <p id="contactSellerText">Clique sur le lien WhatsApp pour parler directement avec le vendeur.</p>
+      <div class="contact-box">
+        <div class="contact-icon">💬</div>
+        <h3 id="contactServiceName">Service</h3>
+        <p id="contactSellerInfo">WhatsApp vendeur</p>
+        <a id="contactWhatsappLink" class="whatsapp-link" target="_blank">Ouvrir WhatsApp</a>
+      </div>
+      <p class="small-note">Le vendeur reçoit aussi une notification dans son compte et un email simulé.</p>
+    </div>
+  </div>
+
+  <div class="modal" id="notificationsModal">
+    <div class="modal-content">
+      <button class="close" onclick="closeModal('notificationsModal')">×</button>
+      <h2>Notifications</h2>
+      <p>Tu verras ici les réponses à tes posts et les gens qui postulent à tes offres.</p>
+      <div id="notificationsList" class="job-list modal-list"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="myContentModal">
+    <div class="modal-content xlarge">
+      <button class="close" onclick="closeModal('myContentModal')">×</button>
+      <h2>Mes publications, offres et services marketplace</h2>
+      <p>Ici tu peux modifier, supprimer, voir tes candidatures reçues et changer le statut de tes offres.</p>
+      <div id="myContentList" class="job-list modal-list"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="editJobModal">
+    <div class="modal-content">
+      <button class="close" onclick="closeModal('editJobModal')">×</button>
+      <h2>Modifier l’offre</h2>
+      <form id="editJobForm" class="form">
+        <input id="editJobIndex" type="hidden" />
+        <input id="editJobTitle" placeholder="Titre du poste" required />
+        <input id="editJobCompany" placeholder="Entreprise" required />
+        <select id="editJobCity" required>
+          <option>Kinshasa</option>
+          <option>Lubumbashi</option>
+          <option>Mbuji-Mayi</option>
+          <option>Kisangani</option>
+          <option>Kananga</option>
+          <option>Goma</option>
+          <option>Bukavu</option>
+          <option>Kolwezi</option>
+          <option>Matadi</option>
+          <option>Bunia</option>
+        </select>
+        <select id="editJobMode">
+          <option>Temps plein</option>
+          <option>Temps partiel</option>
+          <option>En ligne</option>
+        </select>
+        <select id="editJobCategory">
+          <option>Diplômé</option>
+          <option>Petit boulot</option>
+          <option>Freelance</option>
+          <option>Stage</option>
+        </select>
+        <input id="editJobSalary" placeholder="Salaire" />
+        <textarea id="editJobDesc" placeholder="Description" required></textarea>
+        <textarea id="editJobReq" placeholder="Exigences" required></textarea>
+        <button type="submit">Enregistrer modification</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="editPublicationModal">
+    <div class="modal-content">
+      <button class="close" onclick="closeModal('editPublicationModal')">×</button>
+      <h2>Modifier la publication</h2>
+      <form id="editPublicationForm" class="form">
+        <input id="editPubIndex" type="hidden" />
+        <select id="editPubType">
+          <option>Annonce</option>
+          <option>Demande d’emploi</option>
+          <option>Conseil carrière</option>
+          <option>Formation</option>
+          <option>Actualité</option>
+        </select>
+        <input id="editPubTitle" placeholder="Titre" required />
+        <textarea id="editPubDesc" placeholder="Description" required></textarea>
+        <button type="submit">Enregistrer modification</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="serviceCommentModal">
+    <div class="modal-content">
+      <button class="close" onclick="closeModal('serviceCommentModal')">×</button>
+      <h2 id="serviceCommentTitle">Commentaires</h2>
+      <div id="serviceCommentsList" class="job-list modal-list"></div>
+      <form id="serviceCommentForm" class="form">
+        <input id="commentServiceIndex" type="hidden" />
+        <input id="serviceCommentName" placeholder="Votre nom" />
+        <textarea id="serviceCommentText" placeholder="Votre commentaire..." required></textarea>
+        <button type="submit">Commenter</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="settingsModal">
+    <div class="modal-content">
+      <button class="close" onclick="closeModal('settingsModal')">×</button>
+      <h2>Paramètres du compte</h2>
+      <form class="form" id="settingsForm">
+        <label>Langue</label>
+        <select id="languageSetting">
+<option>Français</option>
+<option>English</option>
+</select>
+
+        <label>Sécurité</label>
+        <input id="oldPassword" type="password" placeholder="Ancien mot de passe" />
+        <input id="newPassword" type="password" placeholder="Nouveau mot de passe" />
+
+        <label>Informations du compte</label>
+        <input id="accountName" placeholder="Nom" />
+        <input id="accountEmail" type="email" placeholder="Email" />
+
+        <button type="submit">Enregistrer les paramètres</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="postPublicationModal">
+    <div class="modal-content">
+      <button class="close" onclick="closeModal('postPublicationModal')">×</button>
+      <h2>Poster une publication</h2>
+      <form id="publicationForm" class="form">
+        <select id="pubType">
+          <option>Annonce</option>
+          <option>Demande d’emploi</option>
+          <option>Conseil carrière</option>
+          <option>Formation</option>
+          <option>Actualité</option>
+        </select>
+        <input id="pubTitle" placeholder="Titre de la publication" required />
+        <textarea id="pubDesc" placeholder="Écrivez votre publication..." required></textarea>
+        <label class="upload-label">
+          Images / PDF / fichiers
+          <input id="pubFiles" type="file" multiple accept="image/*,.pdf,.doc,.docx" onchange="previewFiles(this,'pubPreview')" />
+        </label>
+        <div class="preview" id="pubPreview"></div>
+        <button type="submit">Publier</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="postJobModal">
+    <div class="modal-content">
+      <button class="close" onclick="closeModal('postJobModal')">×</button>
+      <h2>Publier une offre gratuite</h2>
+      <form id="jobForm" class="form">
+        <div class="form-row">
+          <input id="jobTitle" placeholder="Titre du poste" required />
+          <input id="jobCompany" placeholder="Entreprise" required />
+        </div>
+        <div class="form-row">
+          <select id="jobCity" required>
+<option value="">Toute la RDC</option>
+<option>Kinshasa</option>
+<option>Lubumbashi</option>
+<option>Mbuji-Mayi</option>
+<option>Kisangani</option>
+<option>Kananga</option>
+<option>Goma</option>
+<option>Bukavu</option>
+<option>Kolwezi</option>
+<option>Matadi</option>
+<option>Bunia</option>
+</select>
+          <select id="jobMode">
+            <option>Temps plein</option>
+            <option>Temps partiel</option>
+            <option>En ligne</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <select id="jobCategory">
+            <option>Diplômé</option>
+            <option>Petit boulot</option>
+            <option>Freelance</option>
+            <option>Stage</option>
+          </select>
+          <input id="jobSalary" placeholder="Salaire ex: 500$" />
+        </div>
+        <textarea id="jobDesc" placeholder="Description complète du poste" required></textarea>
+        <textarea id="jobReq" placeholder="Exigences" required></textarea>
+
+        <h3>À propos de l’entreprise</h3>
+        <input id="companySector" placeholder="Secteur" required />
+        <input id="companyAddress" placeholder="Adresse" required />
+        <input id="companyMap" placeholder="Lien Google Maps" required />
+        <textarea id="companyAbout" placeholder="Description entreprise" required></textarea>
+
+        <label class="upload-label">
+          Upload Images/PDF
+          <input id="jobFiles" type="file" multiple accept="image/*,.pdf,.doc,.docx" onchange="previewFiles(this,'jobPreview')" />
+        </label>
+        <div class="preview" id="jobPreview"></div>
+        <button type="submit">Publier</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="applyModal">
+    <div class="modal-content">
+      <button class="close" onclick="closeModal('applyModal')">×</button>
+      <h2 id="applyTitle">Postuler</h2>
+      <form id="applyForm" class="form">
+        <div class="form-row">
+          <input id="appName" placeholder="Nom complet" required />
+          <input id="appEmail" type="email" placeholder="Email" required />
+        </div>
+        <input id="appPhone" placeholder="Téléphone" required />
+        <textarea id="appAbout" placeholder="Parlez de vous, vos expériences et votre motivation..." required></textarea>
+        <label class="upload-label">
+          Upload CV, diplôme, portfolio
+          <input id="appFiles" type="file" multiple accept=".pdf,.doc,.docx,image/*" onchange="previewFiles(this,'applyPreview')" />
+        </label>
+        <div class="preview" id="applyPreview"></div>
+        <button type="submit">ENVOYER LA CANDIDATURE</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="serviceModal">
+    <div class="modal-content">
+      <button class="close" onclick="closeModal('serviceModal')">×</button>
+      <h2>Publier service premium</h2><p>Paiement simulé: Carte ou PayPal</p>
+      <form id="serviceForm" class="form">
+        <div class="form-row">
+          <input id="serviceTitle" placeholder="Service" required />
+          <input id="servicePrice" placeholder="Prix" required />
+        </div>
+        <div class="form-row">
+          <input id="serviceWhatsapp" placeholder="Lien WhatsApp ex: https://wa.me/243..." required />
+          <input id="serviceEmail" type="email" placeholder="Email vendeur" />
+        </div>
+        <select id="serviceCity" required>
+<option value="">Toute la RDC</option>
+<option>Kinshasa</option>
+<option>Lubumbashi</option>
+<option>Mbuji-Mayi</option>
+<option>Kisangani</option>
+<option>Kananga</option>
+<option>Goma</option>
+<option>Bukavu</option>
+<option>Kolwezi</option>
+<option>Matadi</option>
+<option>Bunia</option>
+</select>
+        <textarea id="serviceDesc" placeholder="Description du service" required></textarea>
+        <button type="submit">Publier service</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="adminPasswordModal">
+    <div class="modal-content small">
+      <button class="close" onclick="closeModal('adminPasswordModal')">×</button>
+      <h2>Accès administrateur</h2>
+      <p>Clique 5 fois sur le logo puis entre le mot de passe.</p>
+      <form class="form" id="adminPasswordForm">
+        <input id="adminPasswordInput" type="password" placeholder="Mot de passe" required />
+        <button type="submit">SE CONNECTER</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="adminModal">
+    <div class="modal-content xlarge">
+      <button class="close" onclick="closeModal('adminModal')">×</button>
+      <h2>Page Administrateur KAZI</h2>
+
+      <div class="admin-box">
+        <h3>Modifier l’accueil</h3>
+        <form class="form" id="adminTextForm">
+          <input id="adminHeroTitle" placeholder="Nouveau titre" />
+          <textarea id="adminHeroDesc" placeholder="Nouvelle description"></textarea>
+          <button type="submit">Enregistrer</button>
+        </form>
+      </div>
+
+      
+<div class="admin-box">
+<h3>Paiement Premium Marketplace</h3>
+<form class="form" id="paymentAdminForm">
+<input id="receiveName" placeholder="Nom bénéficiaire">
+<select id="receiveMethod"><option>Airtel Money</option><option>M-Pesa</option><option>Orange Money</option><option>PayPal</option></select>
+<input id="receiveInfo" placeholder="Numéro ou email réception">
+<button type="submit">Enregistrer paiement</button>
+</form>
+</div>
+<div class="admin-box">
+        <h3>Gestion des offres</h3>
+        <div id="adminJobs"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+
+<footer style="margin-top:60px;padding:40px;border-top:1px solid #222;color:#bbb;text-align:center">
+<h2>À propos de KAZI</h2>
+<p>KAZI est une plateforme créée pour rendre les opportunités de travail plus accessibles en RDC.</p>
+<p>Créateur : Dan Maloba — Ingénieur en Nanotechnology & Material Science.</p>
+<p>Vision : rendre le travail plus accessible à tous.</p>
+<label style="display:flex;justify-content:center;gap:10px;margin-top:15px">
+<input type="checkbox" id="licenseAccept"> J’accepte les conditions d’utilisation et la licence KAZI.
+</label>
+<p style="font-size:12px;color:#777">Licence KAZI : les utilisateurs restent responsables de leurs publications, candidatures, ventes et échanges. KAZI agit comme plateforme de mise en relation.</p>
+</footer>
+
+
+<div class="modal" id="licenseModal">
+<div class="modal-content">
+<h2>Conditions d’utilisation KAZI</h2>
+<p>En utilisant KAZI, vous confirmez que vos publications, ventes, candidatures et échanges sont sous votre responsabilité. Les offres trompeuses et contenus illégaux sont interdits.</p>
+<form id="licenseForm" class="form">
+<input id="licenseFullName" placeholder="Nom complet" required>
+<input id="licenseEmail" type="email" placeholder="Email" required>
+<label><input type="checkbox" id="licenseCheck" required> J’accepte la licence KAZI</label>
+<button type="submit">ACCEPTER</button>
+</form>
+</div>
+</div>
+
+</body>
+</html>
